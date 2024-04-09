@@ -1,10 +1,22 @@
 package io.github.lumkit.desktop.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import com.formdev.flatlaf.FlatLaf
+import com.formdev.flatlaf.themes.FlatMacDarkLaf
+import com.formdev.flatlaf.themes.FlatMacLightLaf
+import io.github.lumkit.desktop.data.DarkThemeMode
+import javax.swing.UIManager
 
 internal val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -84,17 +96,73 @@ internal val darkScheme = darkColorScheme(
 
 @Composable
 fun LintTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        darkTheme -> darkScheme
-        else -> lightScheme
+    val themeStore = LocalThemeStore.current
+
+    val colorScheme = when (themeStore.darkTheme) {
+        DarkThemeMode.SYSTEM -> {
+            if (themeStore.isSystemDarkTheme) {
+                themeStore.isDarkTheme = true
+                themeStore.colorSchemes.dark
+            } else {
+                themeStore.isDarkTheme = false
+                themeStore.colorSchemes.light
+            }
+        }
+
+        DarkThemeMode.LIGHT -> {
+            themeStore.isDarkTheme = false
+            themeStore.colorSchemes.light
+        }
+
+        DarkThemeMode.DARK -> {
+            themeStore.isDarkTheme = true
+            themeStore.colorSchemes.dark
+        }
     }
 
+    // update window theme
+    try {
+        val primary = colorScheme.primary
+        FlatLaf.setSystemColorGetter { name: String ->
+            if (name == "accent")
+                java.awt.Color(primary.toArgb())
+            else null
+        }
+        if (themeStore.isDarkTheme) {
+            FlatMacDarkLaf.setup()
+            FlatMacDarkLaf.updateUILater()
+        } else {
+            FlatMacLightLaf.setup()
+            FlatMacLightLaf.updateUILater()
+        }
+    } catch (_: Exception) {}
+
+    val javaColor = UIManager.getColor("Panel.background")
+
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = colorScheme.copy(
+            background = Color(javaColor.red, javaColor.green, javaColor.blue, javaColor.alpha),
+        ),
         content = content
     )
 }
 
+@Composable
+fun AnimatedLintTheme(
+    modifier: Modifier,
+    content: @Composable () -> Unit
+) {
+    LintTheme {
+        val background by animateColorAsState(
+            MaterialTheme.colorScheme.background,
+            animationSpec = tween(easing = LinearEasing)
+        )
+        Surface(
+            modifier = modifier,
+            color = background,
+            content = content
+        )
+    }
+}

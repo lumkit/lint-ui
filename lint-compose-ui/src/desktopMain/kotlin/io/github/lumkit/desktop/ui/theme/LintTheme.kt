@@ -3,12 +3,13 @@ package io.github.lumkit.desktop.ui.theme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.*
 import com.google.gson.Gson
 import io.github.lumkit.desktop.Const
 import io.github.lumkit.desktop.annotates.MODE_FILES
 import io.github.lumkit.desktop.common.toColor
 import io.github.lumkit.desktop.context.Context
+import io.github.lumkit.desktop.data.DarkThemeMode
 import io.github.lumkit.desktop.data.SchemesBasic
 import io.github.lumkit.desktop.data.ThemeBean
 import io.github.lumkit.desktop.preferences.SharedPreferences
@@ -16,7 +17,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.*
 
-val LocalLintThemeColorSchemes = compositionLocalOf<LintTheme.LintThemeColorSchemes> { error("not provided") }
+val LocalLintTheme = compositionLocalOf<LintTheme> { error("Not provided.") }
+val LocalThemeStore = compositionLocalOf<ThemeStore> { error("Not provided.") }
+val DefaultLintTheme = LintTheme.LintThemeColorSchemes(
+    label = "Default",
+    light = lightScheme,
+    dark = darkScheme,
+)
+
+/**
+ * Global theme color status container.
+ */
+class ThemeStore {
+    var darkTheme by mutableStateOf(DarkThemeMode.SYSTEM)
+    var colorSchemes by mutableStateOf(
+        DefaultLintTheme
+    )
+    var isSystemDarkTheme by mutableStateOf(false)
+    var isDarkTheme by mutableStateOf(false)
+}
 
 class LintTheme internal constructor(
     private val context: Context,
@@ -36,8 +55,8 @@ class LintTheme internal constructor(
      */
     fun loadThemesList(): List<ThemeBean> {
         val themeBeans = ArrayList<ThemeBean>()
-        themesDir.listFiles()?.sortedBy { it.name }?.forEach { file ->
-            val name = file.name.also { it.substring(0, it.lastIndexOf(".")) }
+        val listFiles = themesDir.listFiles()
+        listFiles?.sortedBy { it.lastModified() }?.forEach { file ->
             themeBeans.add(
                 FileInputStream(file).use {
                     BufferedInputStream(it).use { buffered ->
@@ -46,7 +65,7 @@ class LintTheme internal constructor(
                             ThemeBean::class.java
                         )
                     }
-                }.copy(label = name)
+                }.copy(label = file.name)
             )
         }
         return themeBeans
@@ -78,36 +97,56 @@ class LintTheme internal constructor(
     }
 
     /**
-     * Tells the application that the theme profile [themeFile] has been used (but will not be loaded into memory).
+     * Tells the application that the [themeBean] has been used (but will not be loaded into memory).
      */
-    suspend fun useTheme(themeFile: File): Unit = withContext(Dispatchers.IO) {
-        val themeBean = read(themeFile)
-        sharedPreferences.putString(Const.USED_THEME_FILE_NAME, themeBean.label)
-    }
+    suspend fun useTheme(themeBean: ThemeBean, onCreate: (LintThemeColorSchemes) -> Unit): Unit =
+        withContext(Dispatchers.IO) {
+            sharedPreferences.putString(Const.USED_THEME_FILE_NAME, themeBean.label)
+            onCreate(
+                LintThemeColorSchemes(
+                    label = themeBean.label,
+                    light = this@LintTheme lightColorScheme themeBean.schemes.light,
+                    dark = this@LintTheme lightColorScheme themeBean.schemes.dark,
+                )
+            )
+        }
 
     /**
      * Load the theme that has been used (provided that it has been installed).
      */
-    suspend fun getUsedTheme(): LintThemeColorSchemes {
+    fun getUsedTheme(): LintThemeColorSchemes {
         val themeName = sharedPreferences.getString(Const.USED_THEME_FILE_NAME)
-        val theme = read(File(themesDir, themeName ?: ""))
+        val theme = read(themeName ?: "")
         val schemes = theme.schemes
         return LintThemeColorSchemes(
+            label = theme.label,
             light = this lightColorScheme schemes.light,
             dark = this darkColorScheme schemes.dark,
         )
     }
 
-    private suspend fun read(themeFile: File): ThemeBean = withContext(Dispatchers.IO) {
-        gson.fromJson(themeFile.readText(), ThemeBean::class.java)
-    }
+    fun read(themeName: String): ThemeBean =
+        gson.fromJson(File(themesDir, themeName).readText(), ThemeBean::class.java).copy(label = themeName)
 
     data class LintThemeColorSchemes(
+        val label: String? = null,
         val light: ColorScheme,
         val dark: ColorScheme,
     )
 
-    private infix fun lightColorScheme(scheme: SchemesBasic): ColorScheme = lightColorScheme(
+    fun uninstallThemeByName(name: String, onFailed: () -> Unit = {}, onSuccess: () -> Unit) {
+        val usedThemeName = sharedPreferences.getString(Const.USED_THEME_FILE_NAME)
+        if (name == usedThemeName)
+            throw RuntimeException("The current theme is in use and cannot be uninstalled!")
+        val file = File(themesDir, name)
+        if (file.delete()) {
+            onSuccess()
+        }else {
+            onFailed()
+        }
+    }
+
+    infix fun lightColorScheme(scheme: SchemesBasic): ColorScheme = lightColorScheme(
         primary = scheme.primary.toColor(),
         onPrimary = scheme.onPrimary.toColor(),
         primaryContainer = scheme.primaryContainer.toColor(),
@@ -146,7 +185,7 @@ class LintTheme internal constructor(
         surfaceDim = scheme.surfaceDim.toColor(),
     )
 
-    private infix fun darkColorScheme(scheme: SchemesBasic): ColorScheme = darkColorScheme(
+    infix fun darkColorScheme(scheme: SchemesBasic): ColorScheme = darkColorScheme(
         primary = scheme.primary.toColor(),
         onPrimary = scheme.onPrimary.toColor(),
         primaryContainer = scheme.primaryContainer.toColor(),

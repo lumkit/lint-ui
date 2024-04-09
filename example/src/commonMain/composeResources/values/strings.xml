@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="text_settings">设置</string>
+    <string name="text_dark_theme">深色主题</string>
+    <string name="text_theme_system">跟随系统</string>
+    <string name="text_theme_light">浅色</string>
+    <string name="text_theme_dark">深色</string>
+    <string name="text_settings">设置</string>
+    <string name="text_color_scheme_settings">主题设置</string>
+    <string name="text_color_scheme">主题颜色</string>
+    <string name="text_set_color_theme">获取主题</string>
+    <string name="text_uninstall_theme">卸载主题</string>
+</resources>

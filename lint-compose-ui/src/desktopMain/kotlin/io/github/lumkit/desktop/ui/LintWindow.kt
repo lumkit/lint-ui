@@ -19,6 +19,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+/**
+ * A window with full coverage.
+ * @see [Window]
+ */
 @Composable
 fun LintWindow(
     onCloseRequest: () -> Unit,
@@ -61,6 +65,10 @@ fun LintWindow(
     }
 }
 
+/**
+ * Remember the last size window.
+ * @see [LintWindow]
+ */
 @Composable
 fun LintRememberWindow(
     onCloseRequest: () -> Unit,
@@ -91,8 +99,10 @@ fun LintRememberWindow(
     LaunchedEffect(Unit) {
         snapshotFlow { state.size }
             .onEach {
-                val size = WindowSize(it.width.value, it.height.value)
-                sharedPreferences.putString(Const.WINDOW_SIZE, gson.toJson(size))
+                try {
+                    val size = WindowSize(it.width.value, it.height.value)
+                    sharedPreferences.putString(Const.WINDOW_SIZE, gson.toJson(size))
+                }catch (_ : Exception){}
             }.flowOn(Dispatchers.IO)
             .launchIn(this)
     }

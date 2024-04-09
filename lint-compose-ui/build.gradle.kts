@@ -42,6 +42,9 @@ kotlin {
 
             //gson
             implementation(libs.gson)
+
+            implementation(libs.j.system.theme.detector)
+            implementation(libs.flat.lat)
         }
     }
 }

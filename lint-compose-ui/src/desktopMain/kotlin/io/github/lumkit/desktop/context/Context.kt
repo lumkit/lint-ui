@@ -1,9 +1,11 @@
 package io.github.lumkit.desktop.context
 
 import androidx.compose.runtime.compositionLocalOf
+import io.github.lumkit.desktop.Const
 import io.github.lumkit.desktop.annotates.FileMode
 import io.github.lumkit.desktop.annotates.PreferencesMode
 import io.github.lumkit.desktop.preferences.SharedPreferences
+import io.github.lumkit.desktop.ui.theme.LintTheme
 import org.jetbrains.skiko.hostOs
 import java.io.File
 import java.nio.file.Paths
@@ -45,5 +47,5 @@ abstract class Context {
 //    abstract fun getVersion(): String
 //
 //    abstract fun getVersionName(): String
-
+    abstract fun getTheme(sharedPreferences: SharedPreferences = getSharedPreferences(Const.APP_CONFIGURATION)): LintTheme
 }

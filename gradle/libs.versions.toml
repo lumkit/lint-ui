@@ -6,6 +6,8 @@ kotlin = "1.9.22"
 exposed = "0.49.0"
 sqlite-jdbc = "3.44.1.0"
 gson = "2.10.1"
+j-system-theme-detector = "3.8"
+flat-lat = "3.4.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -23,6 +25,8 @@ exposed-json = { module = "org.jetbrains.exposed:exposed-json", version.ref = "e
 exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+j-system-theme-detector = { module = "com.github.Dansoftowner:jSystemThemeDetector", version.ref = "j-system-theme-detector" }
+flat-lat = { module = "com.formdev:flatlaf", version.ref = "flat-lat" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

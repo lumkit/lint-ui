@@ -1,87 +1,59 @@
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Surface
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.MenuBar
+import io.github.lumkit.desktop.context.LocalContext
+import io.github.lumkit.desktop.data.DarkThemeMode
+import io.github.lumkit.desktop.example.App
 import io.github.lumkit.desktop.lintApplication
-import io.github.lumkit.desktop.preferences.LocalSharedPreferences
 import io.github.lumkit.desktop.ui.LintRememberWindow
-import io.github.lumkit.desktop.ui.LintWindow
+import io.github.lumkit.desktop.ui.theme.AnimatedLintTheme
+import io.github.lumkit.desktop.ui.theme.LocalThemeStore
+import lint_ui.example.generated.resources.*
+import lint_ui.example.generated.resources.Res
+import lint_ui.example.generated.resources.compose_multiplatform
+import lint_ui.example.generated.resources.text_dark_theme
+import lint_ui.example.generated.resources.text_settings
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import java.awt.Dimension
 
+@OptIn(ExperimentalResourceApi::class)
 fun main() = lintApplication(
     packageName = "LintUIExample"
 ) {
-    val sharedPreferences = LocalSharedPreferences.current
+    val context = LocalContext.current
 
-    var key by remember { mutableStateOf("") }
-    var value by remember { mutableStateOf("") }
-    val map = remember { mutableStateMapOf<String, String?>() }
-
-    LintRememberWindow(onCloseRequest = ::exitApplication, title = "lint ui") {
-        Surface(
-
+    LintRememberWindow(
+        onCloseRequest = ::exitApplication,
+        title = context.getPackageName(),
+        icon = painterResource(Res.drawable.compose_multiplatform)
+    ) {
+        window.minimumSize = Dimension(800, 600)
+        AnimatedLintTheme(
+            modifier = Modifier.fillMaxSize(),
         ) {
-            Column {
-                Row {
-                    OutlinedTextField(
-                        label = {
-                            Text("Key")
-                        },
-                        value = key,
-                        onValueChange = {
-                            key = it
+            App()
+        }
+
+        // Toggles the global dark theme mode.
+        val themeMode = LocalThemeStore.current
+        MenuBar {
+            Menu(
+                text = stringResource(Res.string.text_settings)
+            ) {
+                Menu(stringResource(Res.string.text_dark_theme)) {
+                    DarkThemeMode.entries.forEach { entry ->
+                        CheckboxItem(
+                            when (entry) {
+                                DarkThemeMode.SYSTEM -> stringResource(Res.string.text_theme_system)
+                                DarkThemeMode.LIGHT -> stringResource(Res.string.text_theme_light)
+                                DarkThemeMode.DARK -> stringResource(Res.string.text_theme_dark)
+                            },
+                            checked = themeMode.darkTheme == entry
+                        ) {
+                            themeMode.darkTheme = entry
                         }
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    OutlinedTextField(
-                        label = {
-                            Text("Value")
-                        },
-                        value = value,
-                        onValueChange = {
-                            value = it
-                        }
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Button(onClick = {
-                        sharedPreferences.putString(key, value)
-                        key = ""
-                        value = ""
-                    }) {
-                        Text("Submit")
-                    }
-                }
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = {
-                    val mapTest = mapOf("hello" to "world", "this is" to "compose desktop")
-                    sharedPreferences.put("hello", mapTest)
-                }) {
-                    Text("Put Map Test")
-                }
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = {
-                    map.putAll(sharedPreferences.getMap("hello"))
-                }) {
-                    Text("Change This Map")
-                }
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = {
-                    map.clear()
-                    map.putAll(sharedPreferences.toMap())
-                }) {
-                    Text("Select All")
-                }
-                Spacer(Modifier.width(8.dp))
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    items(map.entries.toList()) {
-                        Text("Key: ${it.key}  Value: ${it.value}")
                     }
                 }
             }
