@@ -3,16 +3,15 @@ package io.github.lumkit.desktop.example.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SmartButton
-import androidx.compose.material.icons.filled.Widgets
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.ShowChart
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.lumkit.desktop.example.screen.ButtonExampleScreen
-import io.github.lumkit.desktop.example.screen.SettingsScreen
+import io.github.lumkit.desktop.example.screen.*
 
 data class NavItem(
     val title: String,
@@ -59,7 +58,7 @@ val settingsNavigation = NavItem(
 val screens = arrayOf(
     NavItem(
         title = "小组件",
-        subtitle = "一些常用的小组",
+        subtitle = "一些常用的小组件",
         icon = {
             Icon(Icons.Default.Widgets, contentDescription = null)
         },
@@ -81,7 +80,37 @@ val screens = arrayOf(
                 screen = @Composable {
                     ButtonExampleScreen()
                 },
-            )
+            ),
+            NavItem(
+                title = "Lint TextField",
+                subtitle = "基于MD3色彩风格设计的文本输入框",
+                icon = {
+                    Icon(imageVector = Icons.Default.TextFields, contentDescription = null)
+                },
+                screen = @Composable {
+                    TextFieldExampleScreen()
+                },
+            ),
+            NavItem(
+                title = "Lint Progress",
+                subtitle = "基于MD3色彩风格设计的进度条",
+                icon = {
+                    Icon(imageVector = Icons.Filled.Circle, contentDescription = null)
+                },
+                screen = @Composable {
+                    ProgressExampleScreen()
+                },
+            ),
+            NavItem(
+                title = "Lint Chats",
+                subtitle = "一些简单的图表组件",
+                icon = {
+                    Icon(imageVector = Icons.Default.BarChart, contentDescription = null)
+                },
+                screen = @Composable {
+                    ChartExampleScreen()
+                },
+            ),
         ),
     )
 )

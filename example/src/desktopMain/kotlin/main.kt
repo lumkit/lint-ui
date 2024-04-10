@@ -39,21 +39,17 @@ fun main() = lintApplication(
         // Toggles the global dark theme mode.
         val themeMode = LocalThemeStore.current
         MenuBar {
-            Menu(
-                text = stringResource(Res.string.text_settings)
-            ) {
-                Menu(stringResource(Res.string.text_dark_theme)) {
-                    DarkThemeMode.entries.forEach { entry ->
-                        CheckboxItem(
-                            when (entry) {
-                                DarkThemeMode.SYSTEM -> stringResource(Res.string.text_theme_system)
-                                DarkThemeMode.LIGHT -> stringResource(Res.string.text_theme_light)
-                                DarkThemeMode.DARK -> stringResource(Res.string.text_theme_dark)
-                            },
-                            checked = themeMode.darkTheme == entry
-                        ) {
-                            themeMode.darkTheme = entry
-                        }
+            Menu(stringResource(Res.string.text_dark_theme)) {
+                DarkThemeMode.entries.forEach { entry ->
+                    CheckboxItem(
+                        when (entry) {
+                            DarkThemeMode.SYSTEM -> stringResource(Res.string.text_theme_system)
+                            DarkThemeMode.LIGHT -> stringResource(Res.string.text_theme_light)
+                            DarkThemeMode.DARK -> stringResource(Res.string.text_theme_dark)
+                        },
+                        checked = themeMode.darkTheme == entry
+                    ) {
+                        themeMode.darkTheme = entry
                     }
                 }
             }

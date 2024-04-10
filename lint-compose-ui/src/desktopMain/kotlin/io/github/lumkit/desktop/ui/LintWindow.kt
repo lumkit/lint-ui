@@ -15,6 +15,7 @@ import io.github.lumkit.desktop.Const
 import io.github.lumkit.desktop.data.WindowSize
 import io.github.lumkit.desktop.preferences.LocalSharedPreferences
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -98,6 +99,7 @@ fun LintRememberWindow(
 
     LaunchedEffect(Unit) {
         snapshotFlow { state.size }
+            .filter { state.placement == WindowPlacement.Floating }
             .onEach {
                 try {
                     val size = WindowSize(it.width.value, it.height.value)

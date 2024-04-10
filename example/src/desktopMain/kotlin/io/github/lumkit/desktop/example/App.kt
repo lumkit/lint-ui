@@ -3,25 +3,24 @@ package io.github.lumkit.desktop.example
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import io.github.lumkit.desktop.example.navigation.NavItem
 import io.github.lumkit.desktop.example.navigation.screens
 import io.github.lumkit.desktop.example.navigation.settingsNavigation
-import io.github.lumkit.desktop.ui.components.LintCard
-import io.github.lumkit.desktop.ui.components.LintNavigationIconButton
-import io.github.lumkit.desktop.ui.components.LintOutlineCard
-import io.github.lumkit.desktop.ui.components.LintSideNavigationBar
+import io.github.lumkit.desktop.ui.components.*
 
 @Composable
 fun App() {
@@ -33,7 +32,8 @@ fun App() {
     ) {
         SideBar(navItem)
         LintCard(
-            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)),
+            modifier = Modifier.fillMaxSize(),
+            shape = RoundedCornerShape(topStart = 6.dp, topEnd = 0.dp, bottomStart = 0.dp, bottomEnd = 0.dp),
         ) {
             AnimatedContent(
                 targetState = navItem.value.screen,
@@ -61,8 +61,15 @@ private fun SideBar(navItem: MutableState<NavItem>) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val minimize = remember { mutableStateOf(false) }
+        val width by remember { mutableStateOf(320.dp) }
+        var searchValue by remember { mutableStateOf("") }
 
         LintNavigationIconButton(
+            width = width,
+            minimize = minimize.value,
+            title = {
+                Text("控制栏", softWrap = false)
+            },
             onClick = {
                 minimize.value = !minimize.value
             }
@@ -71,30 +78,94 @@ private fun SideBar(navItem: MutableState<NavItem>) {
         }
 
         Column(
-            modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState()).weight(1f)
+            horizontalAlignment = Alignment.End
         ) {
-            screens.forEach { screen ->
-                NavigationSide(minimize, navItem, screen)
+            LintSearchSide(
+                width = width,
+                minimize = minimize.value,
+                icon = {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                },
+                value = searchValue,
+                onValueChange = {
+                    searchValue = it
+                },
+                onClick = {
+                    minimize.value = false
+                },
+                onClean = {
+                    searchValue = ""
+                },
+            )
+            DropdownMenu(
+                searchValue.trim().isNotEmpty(),
+                onDismissRequest = {},
+                properties = PopupProperties(focusable = false)
+            ) {
+                for (i in 0 until 5) {
+                    DropdownMenuItem(
+                        text = {
+                            Text("搜索项 ${i + 1}")
+                        },
+                        onClick = {
+                            searchValue = ""
+                        }
+                    )
+                }
             }
         }
 
-        LintNavigationIconButton(
+        Row(
+            modifier = Modifier.fillMaxHeight().weight(1f)
+        ) {
+            val scrollState = rememberScrollState()
+            val adapter = rememberScrollbarAdapter(scrollState)
+            Column(
+                modifier = Modifier.fillMaxHeight().verticalScroll(scrollState)
+            ) {
+                screens.forEach { screen ->
+                    NavigationSide(width, minimize, navItem, screen)
+                }
+            }
+            AnimatedVisibility(
+                visible = !minimize.value,
+            ) {
+                LintVerticalScrollBar(
+                    modifier = Modifier.padding(start = 4.dp),
+                    adapter = adapter
+                )
+            }
+        }
+
+        LintSideNavigationBar(
+            minimize = minimize.value,
+            width = width,
             selected = navItem.value == settingsNavigation,
             onClick = {
                 navItem.value = settingsNavigation
+            },
+            icon = {
+                Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+            },
+            title = {
+                Text(settingsNavigation.title, softWrap = false)
             }
-        ) {
-            Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-        }
+        )
         Spacer(Modifier)
     }
 }
 
 @Composable
-private fun NavigationSide(minimize: MutableState<Boolean>, navItemState: MutableState<NavItem>, navItem: NavItem) {
+private fun NavigationSide(
+    width: Dp,
+    minimize: MutableState<Boolean>,
+    navItemState: MutableState<NavItem>,
+    navItem: NavItem
+) {
     var isExpanded by remember { mutableStateOf(true) }
     val navItems = navItem.items
     LintSideNavigationBar(
+        width = width,
         minimize = minimize.value,
         selected = navItemState.value == navItem,
         expanded = isExpanded,
@@ -120,7 +191,7 @@ private fun NavigationSide(minimize: MutableState<Boolean>, navItemState: Mutabl
         } else {
             {
                 navItems.forEach {
-                    NavigationSide(minimize, navItemState, it)
+                    NavigationSide(width, minimize, navItemState, it)
                 }
             }
         }

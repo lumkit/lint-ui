@@ -205,14 +205,12 @@ private fun InstallThemeItem(
     themes: SnapshotStateList<LintTheme.LintThemeColorSchemes>,
     themeStore: ThemeStore, ) {
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
-    val fileChooser = remember {
-        JFileChooser().apply {
-            fileFilter = FileNameExtensionFilter("选择主题配置文件（.json）", "json")
-            isAcceptAllFileFilterUsed = false
-        }
-    }
     LintOutlineCard(
         onClick = {
+            val fileChooser = JFileChooser().apply {
+                fileFilter = FileNameExtensionFilter("选择主题配置文件（.json）", "json")
+                isAcceptAllFileFilterUsed = false
+            }
             val result = fileChooser.showOpenDialog(null)
             if (result == JFileChooser.APPROVE_OPTION) {
                 coroutineScope.launch {

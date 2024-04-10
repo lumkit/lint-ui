@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.lumkit"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.1-SNAPSHOT"
 
 kotlin {
     jvm("desktop")

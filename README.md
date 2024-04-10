@@ -1,8 +1,12 @@
 # Lint UI for Compose Desktop
+
+[![License](https://img.shields.io/github/license/lumkit/lint-ui)](LICENSE)
+[![Version](https://img.shields.io/github/v/release/lumkit/lint-ui?include_prereleases)](https://github.com/Konyaco/compose-fluent-ui/releases)
+
  A Compose Desktop UI framework supporting global theme control. (aka LintUI)
 
 ## Introduce
-This is a UI framework developed for Compose Desktop, 
+This is a UI framework developed for Compose Desktop (on Material Design 3), 
 and it integrates many features that normal applications 
 should have (such as data persistence).
 This UI framework will remain open source and free.

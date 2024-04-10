@@ -1,7 +1,6 @@
 package io.github.lumkit.desktop.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -73,7 +73,10 @@ fun LintSideNavigationBar(
 @Composable
 fun LintNavigationIconButton(
     modifier: Modifier = Modifier.size(navHeight),
+    width: Dp = 320.dp,
+    minimize: Boolean = false,
     selected: Boolean = false,
+    title: @Composable (() -> Unit)? = null,
     onClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -85,20 +88,111 @@ fun LintNavigationIconButton(
         },
         tween(durationMillis = 300, easing = LinearOutSlowInEasing)
     )
-    Box(
-        modifier = Modifier.then(modifier)
-            .background(onSelectedColor, RoundedCornerShape(6.dp))
+
+    val animatedWidth by animateDpAsState(
+        if (minimize) navHeight else width,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+    )
+
+    Row (
+        modifier = Modifier.width(animatedWidth),
+        verticalAlignment = Alignment.CenterVertically,
+    ){
+        Box(
+            modifier = Modifier.then(modifier)
+                .background(onSelectedColor, RoundedCornerShape(6.dp))
+                .clip(RoundedCornerShape(6.dp))
+                .clickable {
+                    onClick()
+                },
+        ) {
+            NavThumb(selected)
+            Surface(
+                modifier = Modifier.size(16.dp).align(Alignment.Center),
+                color = Color.Transparent,
+                content = content
+            )
+        }
+        title?.also {
+            AnimatedVisibility(
+                !minimize,
+            ) {
+                Row {
+                    Spacer(modifier = Modifier.size(16.dp))
+                    ProvideTextStyle(value = MaterialTheme.typography.bodyMedium) {
+                        it()
+                    }
+                    Spacer(modifier = Modifier.size(16.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LintSearchSide(
+    modifier: Modifier = Modifier,
+    width: Dp = 320.dp,
+    minimize: Boolean = false,
+    value: String,
+    onValueChange: (String) -> Unit,
+    icon: @Composable () -> Unit,
+    onClick: () -> Unit = {},
+    onClean: () -> Unit = {},
+) {
+    val animatedWidth by animateDpAsState(
+        if (minimize) navHeight else width,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+    )
+
+    Row (
+        modifier = Modifier.height(navHeight).width(animatedWidth)
             .clip(RoundedCornerShape(6.dp))
-            .clickable {
-                onClick()
-            },
+            .then(modifier)
     ) {
-        NavThumb(selected)
-        Surface(
-            modifier = Modifier.size(16.dp).align(Alignment.Center),
-            color = Color.Transparent,
-            content = content
-        )
+        AnimatedContent(
+            targetState = minimize
+        ) {
+            if (it) {
+                Box(
+                    modifier = Modifier.size(navHeight)
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable {
+                            onClick()
+                        },
+                ) {
+                    Surface(
+                        modifier = Modifier.size(16.dp).align(Alignment.Center),
+                        color = Color.Transparent,
+                        content = icon
+                    )
+                }
+            } else {
+                ProvideTextStyle(
+                    MaterialTheme.typography.bodyMedium
+                ) {
+                    LintTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = value,
+                        onValueChange = onValueChange,
+                        trailingIcon = {
+                            if (value.isNotEmpty()) {
+                                Icon(
+                                    modifier = Modifier.size(16.dp)
+                                        .clip(CircleShape)
+                                        .clickable {
+                                            onClean()
+                                        },
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        singleLine = true
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -199,8 +293,8 @@ private fun RowScope.NavLabel(
                 }
             }
         }
+        Spacer(modifier = Modifier.size(16.dp))
         child?.run {
-            Spacer(modifier = Modifier.size(16.dp))
             TrailingIconButton(expanded = expanded, onExpandedClick)
             Spacer(modifier = Modifier.size(16.dp))
         }
