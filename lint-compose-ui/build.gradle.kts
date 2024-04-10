@@ -1,10 +1,13 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.jetbrainsCompose)
+    `maven-publish`
 }
 
 group = "io.github.lumkit"
 version = "1.0.1-SNAPSHOT"
+
+
 
 kotlin {
     jvm("desktop")
