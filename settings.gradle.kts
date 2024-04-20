@@ -9,6 +9,9 @@ pluginManagement {
         maven(url = "https://jitpack.io")
         maven(url = "https://maven.aliyun.com/repository/public/")
         maven(url = "https://maven.aliyun.com/repository/google/")
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
 }
 
@@ -20,8 +23,12 @@ dependencyResolutionManagement {
         maven(url = "https://jitpack.io")
         maven(url = "https://maven.aliyun.com/repository/public/")
         maven(url = "https://maven.aliyun.com/repository/google/")
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
 }
 rootProject.name = "lint-ui"
+//includeBuild("build-plugin")
 include(":example")
 include(":lint-compose-ui")

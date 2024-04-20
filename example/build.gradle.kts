@@ -10,25 +10,15 @@ kotlin {
     
     sourceSets {
         val desktopMain by getting
-        
+
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.ui)
             implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(compose.animation)
-            implementation(compose.animationGraphics)
-            implementation(compose.material3)
-            implementation(compose.runtimeSaveable)
-            implementation(compose.preview)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.uiTooling)
-            implementation(compose.uiUtil)
         }
         desktopMain.dependencies {
+            implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
             implementation(compose.desktop.currentOs)
-            implementation(project(":lint-compose-ui"))
+//            implementation(project(":lint-compose-ui"))
+            implementation(libs.lint.compose.ui)
         }
     }
 }
@@ -41,7 +31,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "io.github.lumkit.lint"
-            packageVersion = "1.0.1"
+            packageVersion = libs.versions.lint.compose.ui.get()
         }
     }
 }

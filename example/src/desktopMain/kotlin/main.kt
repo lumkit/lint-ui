@@ -9,10 +9,6 @@ import io.github.lumkit.desktop.ui.LintRememberWindow
 import io.github.lumkit.desktop.ui.theme.AnimatedLintTheme
 import io.github.lumkit.desktop.ui.theme.LocalThemeStore
 import lint_ui.example.generated.resources.*
-import lint_ui.example.generated.resources.Res
-import lint_ui.example.generated.resources.compose_multiplatform
-import lint_ui.example.generated.resources.text_dark_theme
-import lint_ui.example.generated.resources.text_settings
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
