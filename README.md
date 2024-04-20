@@ -52,7 +52,7 @@ dependencyResolutionManagement {
 ### 2. Import the [lint-compose-ui] dependency.
 ```kotlin
 dependencies {
-    // You only need to import dependencies such as jb-compose-desktop-currentOs and JB-compose-components-resources.
+    // You only need to import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
     implementation("io.github.lumkit:lint-compose-ui:1.0.1")
 }
 ```
