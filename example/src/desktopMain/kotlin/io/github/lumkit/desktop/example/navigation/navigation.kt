@@ -112,5 +112,15 @@ val screens = arrayOf(
                 },
             ),
         ),
+    ),
+    NavItem(
+        title = "模态框",
+        subtitle = "一些内置的弹窗样式",
+        icon = {
+            Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null)
+        },
+        screen = @Composable {
+            AlertExampleScreen()
+        },
     )
 )

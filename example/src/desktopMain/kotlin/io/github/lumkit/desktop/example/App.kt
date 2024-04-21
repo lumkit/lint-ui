@@ -133,12 +133,13 @@ private fun SideBar(navItem: MutableState<NavItem>) {
         }
 
         Row(
-            modifier = Modifier.fillMaxHeight().weight(1f)
+            modifier = Modifier.fillMaxHeight().weight(1f),
         ) {
             val scrollState = rememberScrollState()
             val adapter = rememberScrollbarAdapter(scrollState)
             Column(
-                modifier = Modifier.fillMaxHeight().verticalScroll(scrollState)
+                modifier = Modifier.fillMaxHeight().verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 screens.forEach { screen ->
                     NavigationSide(width, minimize, navItem, screen)

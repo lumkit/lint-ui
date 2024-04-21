@@ -17,8 +17,8 @@ kotlin {
         desktopMain.dependencies {
             implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
             implementation(compose.desktop.currentOs)
-//            implementation(project(":lint-compose-ui"))
-            implementation(libs.lint.compose.ui)
+            implementation(project(":lint-compose-ui"))
+//            implementation(libs.lint.compose.ui)
         }
     }
 }
