@@ -34,9 +34,7 @@ This UI framework will remain open source and free.
 - [ ] More features will be continuously updated in the future
 
 ## Screen shoot
-
-![main-light.png](static/img/main-light.png)
-![main-dark.png](static/img/main-dark.png)
+![screen-shoot.png](static/img/screen-shoot.png)
 
 ## Use this library in your project
 
