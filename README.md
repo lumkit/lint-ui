@@ -39,7 +39,15 @@ This UI framework will remain open source and free.
 
 ## Use this library in your project
 
+### LintUI framework version requirements
+
+| Lint UI | Kotlin | Compose Framework | Compose Plugin |   Java   |
+|:-------:|:------:|:-----------------:|:--------------:|:--------:|
+|  1.0.1  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
+|  1.0.2  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
+
 ### 1. Configure the Maven central warehouse for the project.
+
 ```kotlin
 dependencyResolutionManagement {
     repositories {
@@ -49,7 +57,9 @@ dependencyResolutionManagement {
     }
 }
 ```
+
 ### 2. Import the [lint-compose-ui] dependency.
+
 ```kotlin
 dependencies {
     // You only need to import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
@@ -58,6 +68,7 @@ dependencies {
 ```
 
 ### 3. Start writing your first desktop application
+
 ```kotlin
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
@@ -115,6 +126,7 @@ fun main() = lintApplication(
 ```
 
 ## How to use some built-in APIs.
+
 * Context
    ```kotlin
     // Get global context

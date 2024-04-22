@@ -122,5 +122,15 @@ val screens = arrayOf(
         screen = @Composable {
             AlertExampleScreen()
         },
+    ),
+    NavItem(
+        title = "自定义无边框窗口",
+        subtitle = "基于Compose组件绘制的无原生装饰的窗口",
+        icon = {
+            Icon(Icons.Default.Window, contentDescription = null)
+        },
+        screen = @Composable {
+            LayerWindowExampleScreen()
+        },
     )
 )

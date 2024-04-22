@@ -26,10 +26,12 @@ class KeepShell(private val workPath: String) {
             if (reader != null)
                 reader?.close()
         } catch (ex: Exception) {
+            ex.printStackTrace()
         }
         try {
             p?.destroy()
         } catch (ex: Exception) {
+            ex.printStackTrace()
         }
         enterLockTime = 0L
         out = null

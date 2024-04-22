@@ -27,7 +27,6 @@ import io.github.lumkit.desktop.preferences.LocalSharedPreferences
 import io.github.lumkit.desktop.ui.components.*
 import io.github.lumkit.desktop.ui.theme.LocalLintTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
     val navItem = remember { mutableStateOf(screens.first()) }
@@ -57,17 +56,6 @@ fun App() {
             }
         }
     }
-
-    // Gets the global SharedPreferences instance.
-    val sharedPreferences = LocalSharedPreferences.current
-
-    // Get the data in the hardware (is-dark is virtual).
-    val isDark = sharedPreferences.get<String>("is-dark")
-
-    // Put string
-    sharedPreferences.putString("is-dark", isDark)
-    // Put type data
-    sharedPreferences.put("type-data", arrayListOf("Dark", "Light"))
 }
 
 @Composable
