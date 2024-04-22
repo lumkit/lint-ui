@@ -23,6 +23,7 @@ This UI framework will remain open source and free.
     - [x] Dividers (Lint Dividers)
     - [x] Folded container (Lint Folder)
     - [x] Minimizable, collapsible and nestable side navigation bar (Lint Side)
+    - [x] Flexible window without native decoration (Lint Layer Window)
     - [ ] More beautiful and practical UI components will continue to be developed in the future
 - [x] A simple context provider
 - [x] Shared Preferences based on SQLite (SharedPreferences)
