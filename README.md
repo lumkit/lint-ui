@@ -63,7 +63,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    // You only need to import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
+    // You just import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
     implementation("io.github.lumkit:lint-compose-ui:1.0.2")
 }
 ```
