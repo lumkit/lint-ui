@@ -37,6 +37,10 @@ This UI framework will remain open source and free.
 ![screen-shoot.png](static/img/screen-shoot.png)
 
 ## Use this library in your project
+Before that, you can run the example we provided for you to see the concrete effect.
+```shell
+./gradlew desktopRun -DmainClass=MainKt --quiet
+```
 
 ### LintUI framework version requirements
 
