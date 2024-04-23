@@ -1,6 +1,7 @@
 package io.github.lumkit.desktop.context
 
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.awt.ComposeWindow
 import io.github.lumkit.desktop.Const
 import io.github.lumkit.desktop.annotates.FileMode
 import io.github.lumkit.desktop.annotates.PreferencesMode
@@ -15,7 +16,7 @@ val LocalContext = compositionLocalOf<Context> { error("Not provided.") }
 /**
  * Interface to global information about an application environment.
  */
-abstract class Context {
+abstract class Context internal constructor() {
 
     protected val appDir by lazy {
         val path = when {

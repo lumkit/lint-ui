@@ -3,29 +3,29 @@ package io.github.lumkit.desktop.example
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
-import io.github.lumkit.desktop.context.LocalContext
 import io.github.lumkit.desktop.example.navigation.NavItem
 import io.github.lumkit.desktop.example.navigation.screens
 import io.github.lumkit.desktop.example.navigation.settingsNavigation
-import io.github.lumkit.desktop.preferences.LocalSharedPreferences
 import io.github.lumkit.desktop.ui.components.*
-import io.github.lumkit.desktop.ui.theme.LocalLintTheme
 
 @Composable
 fun App() {

@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
@@ -22,18 +25,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.google.gson.Gson
 import io.github.lumkit.desktop.Const
+import io.github.lumkit.desktop.context.ContextWrapper
+import io.github.lumkit.desktop.context.LocalContext
+import io.github.lumkit.desktop.context.LocalContextWrapper
 import io.github.lumkit.desktop.data.WindowSize
 import io.github.lumkit.desktop.preferences.LocalSharedPreferences
+import io.github.lumkit.desktop.preferences.SharedPreferences
 import io.github.lumkit.desktop.ui.theme.AnimatedLintTheme
+import io.github.lumkit.desktop.ui.theme.LintTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import java.awt.Dimension
 import java.awt.event.WindowEvent
 import java.awt.event.WindowFocusListener
+import java.io.File
 
 /**
  * A window with full coverage.
@@ -45,6 +56,7 @@ fun LintWindow(
     state: WindowState = rememberWindowState(
         position = WindowPosition(Alignment.Center)
     ),
+    rememberSize: Boolean = false,
     visible: Boolean = true,
     title: String = "Lint UI",
     icon: Painter? = null,
@@ -58,6 +70,9 @@ fun LintWindow(
     onKeyEvent: (KeyEvent) -> Boolean = { false },
     content: @Composable FrameWindowScope.() -> Unit
 ) {
+    if (rememberSize) {
+        state.RememberWindowSize(title)
+    }
     Window(
         onCloseRequest,
         state,
@@ -73,12 +88,130 @@ fun LintWindow(
         onPreviewKeyEvent,
         onKeyEvent
     ) {
+        val context = LocalContext.current
+        val contextWrapper = remember {
+            object : ContextWrapper() {
+                override fun getWindow(): ComposeWindow = window
+                override fun getPackageName(): String = context.getPackageName()
+                override fun getDir(name: String): File = context.getDir(name)
+                override fun getFilesDir(): File = context.getFilesDir()
+                override fun getSharedPreferences(name: String): SharedPreferences = context.getSharedPreferences(name)
+                override fun getTheme(sharedPreferences: SharedPreferences): LintTheme =
+                    context.getTheme(sharedPreferences)
+            }
+        }
+
+        val toastShowState = remember { mutableStateOf(false) }
+
+        LaunchedEffect(true) {
+            withContext(Dispatchers.IO) {
+                val queue = contextWrapper.toastQueues
+                while (isActive) {
+                    if (queue.isNotEmpty()) {
+                        val toastQueue = queue.first()
+                        toastShowState.value = true
+                        delay(toastQueue.time)
+                        toastShowState.value = false
+                        delay(400)
+                        queue.remove(toastQueue)
+                    }
+                }
+            }
+        }
+
+        Toast(toastShowState, contextWrapper)
+
         window.minimumSize = Dimension(16, 16)
         if (!transparent) {
             // make ComposeWindowPanel cover the whole window.
             MenuBar {}
         }
-        content()
+        CompositionLocalProvider(
+            LocalContextWrapper provides contextWrapper,
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun Toast(toastShowState: MutableState<Boolean>, contextWrapper: ContextWrapper) {
+    val toastQueues = contextWrapper.toastQueues
+    var init by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        snapshotFlow { toastShowState.value }
+            .onEach {
+                if (it) delay(50)
+                init = it
+            }.flowOn(Dispatchers.IO)
+            .launchIn(this)
+    }
+    if (toastQueues.isNotEmpty()) {
+        val toastQueue = toastQueues.first()
+
+        val enterTransition: EnterTransition = when (toastQueue.alignment) {
+            Alignment.TopStart -> slideInHorizontally()
+            Alignment.TopCenter -> slideInVertically()
+            Alignment.TopEnd -> slideInHorizontally(initialOffsetX = { it / 2 })
+            Alignment.CenterStart -> slideInHorizontally()
+            Alignment.Center -> scaleIn()
+            Alignment.CenterEnd -> slideInHorizontally(initialOffsetX = { it / 2 })
+            Alignment.BottomStart -> slideInHorizontally()
+            Alignment.BottomCenter -> slideInVertically(initialOffsetY = { it / 2 })
+            Alignment.BottomEnd -> slideInHorizontally(initialOffsetX = { it / 2 })
+            else -> EnterTransition.None
+        }
+
+        val exitTransition: ExitTransition = when (toastQueue.alignment) {
+            Alignment.TopStart -> slideOutHorizontally()
+            Alignment.TopCenter -> slideOutVertically()
+            Alignment.TopEnd -> slideOutHorizontally(targetOffsetX = { it / 2 })
+            Alignment.CenterStart -> slideOutHorizontally()
+            Alignment.Center -> scaleOut()
+            Alignment.CenterEnd -> slideOutHorizontally(targetOffsetX = { it / 2 })
+            Alignment.BottomStart -> slideOutHorizontally()
+            Alignment.BottomCenter -> slideOutVertically(targetOffsetY = { it / 2 })
+            Alignment.BottomEnd -> slideOutHorizontally(targetOffsetX = { it / 2 })
+            else -> ExitTransition.None
+        }
+
+        Popup(
+            alignment = toastQueue.alignment,
+            properties = remember {
+                PopupProperties(
+                    focusable = false,
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = false,
+                    clippingEnabled = true
+                )
+            }
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+            ) {
+                AnimatedVisibility(
+                    visible = init,
+                    enter = fadeIn() + enterTransition,
+                    exit = fadeOut() + exitTransition,
+                ) {
+                    AnimatedLintTheme(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(
+                                border = BorderStroke(1.dp, DividerDefaults.color),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                    ) {
+                        Text(
+                            text = toastQueue.message,
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -89,6 +222,9 @@ fun LintWindow(
 @Deprecated(
     message = "Window size persistence has been encapsulated as a function [WindowState.RememberWindowSize]," +
             " and this component will no longer be recommended.",
+    replaceWith = ReplaceWith(
+        "LintWindow(\nonCloseRequest = onCloseRequest, \nstate = state, \nrememberSize = true, \nvisible = visible, \ntitle = title, \nicon = icon, \nundecorated = undecorated, \ntransparent = transparent, \nresizable = resizable, \nenabled = enabled, \nfocusable = focusable, \nalwaysOnTop = alwaysOnTop, \nonPreviewKeyEvent = onPreviewKeyEvent, \nonKeyEvent = onKeyEvent, \ncontent = content\n)"
+    )
 )
 @Composable
 fun LintRememberWindow(
@@ -109,10 +245,10 @@ fun LintRememberWindow(
     onKeyEvent: (KeyEvent) -> Boolean = { false },
     content: @Composable FrameWindowScope.() -> Unit
 ) {
-    state.RememberWindowSize(id = title)
     LintWindow(
         onCloseRequest,
         state,
+        true,
         visible,
         title,
         icon,
@@ -149,10 +285,6 @@ fun LintLayerWindow(
     onKeyEvent: (KeyEvent) -> Boolean = { false },
     content: @Composable FrameWindowScope.() -> Unit
 ) {
-    if (isRememberSize) {
-        state.RememberWindowSize(id = title)
-    }
-
     val isShow = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -164,6 +296,7 @@ fun LintLayerWindow(
 
     LayerWindow(
         showState = showState,
+        isRememberSize = isRememberSize,
         isShow = isShow,
         onCloseRequest = onCloseRequest,
         state = state,
@@ -185,6 +318,7 @@ fun LintLayerWindow(
 @Composable
 private fun LayerWindow(
     showState: MutableState<Boolean>,
+    isRememberSize: Boolean,
     isShow: MutableState<Boolean>,
     onCloseRequest: () -> Unit,
     state: WindowState,
@@ -206,6 +340,7 @@ private fun LayerWindow(
             onCloseRequest = onCloseRequest,
             state = state,
             visible = visible,
+            rememberSize = isRememberSize,
             title = title,
             icon = icon,
             undecorated = true,
@@ -277,7 +412,14 @@ private fun FrameWindowScope.CardLayer(
                 transitionSpec = {
                     (fadeIn(animationSpec = tween(300, delayMillis = 90)) +
                             scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)))
-                        .togetherWith(fadeOut(animationSpec = tween(220)) + scaleOut(animationSpec = tween(400, delayMillis = 100)))
+                        .togetherWith(
+                            fadeOut(animationSpec = tween(220)) + scaleOut(
+                                animationSpec = tween(
+                                    400,
+                                    delayMillis = 100
+                                )
+                            )
+                        )
                 }
             ) {
                 if (it) {
@@ -309,9 +451,10 @@ fun WindowState.RememberWindowSize(
     try {
         val windowSize = gson.fromJson(sharedPreferences.getString(key), WindowSize::class.java)
         size = DpSize(windowSize.width.dp, windowSize.height.dp)
-    } catch (_: Exception) {}
+    } catch (_: Exception) {
+    }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(this) {
         snapshotFlow { size }
             .filter { placement == WindowPlacement.Floating }
             .onEach {
@@ -319,7 +462,8 @@ fun WindowState.RememberWindowSize(
                     try {
                         val size = WindowSize(it.width.value, it.height.value)
                         sharedPreferences.putString(key, gson.toJson(size))
-                    } catch (_: Exception) {}
+                    } catch (_: Exception) {
+                    }
                 }
             }.flowOn(Dispatchers.IO)
             .launchIn(this)

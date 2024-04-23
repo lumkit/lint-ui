@@ -48,8 +48,9 @@ fun LintHorizontalLinearProgress(
     val circleRadius = with(density) { thickness.toPx() * .5f }
 
     var release by remember { mutableStateOf(true) }
+    var moving by remember { mutableStateOf(false) }
 
-    val realProgress = if (!release) {
+    val realProgress = if (!release && moving) {
         progress
     } else {
         val animateProgress by animateFloatAsState(
@@ -68,13 +69,19 @@ fun LintHorizontalLinearProgress(
         modifier = modifier.height(thickness)
             .onPointerEvent(PointerEventType.Release) {
                 release = true
+                moving = false
+                it.changes.first().consume()
             }.onPointerEvent(PointerEventType.Press) {
                 release = false
+                moving = false
                 onProgressChanged(((it.changes.first().position.x - circleRadius) / viewWidth).bounds(0f, 1f))
+                it.changes.first().consume()
             }.onPointerEvent(PointerEventType.Move) {
+                moving = true
                 if (!release) {
                     onProgressChanged(((it.changes.first().position.x - circleRadius) / viewWidth).bounds(0f, 1f))
                 }
+                it.changes.first().consume()
             },
     ) {
         val thicknessPx = thickness.toPx()

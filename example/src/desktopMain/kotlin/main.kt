@@ -5,7 +5,7 @@ import io.github.lumkit.desktop.context.LocalContext
 import io.github.lumkit.desktop.data.DarkThemeMode
 import io.github.lumkit.desktop.example.App
 import io.github.lumkit.desktop.lintApplication
-import io.github.lumkit.desktop.ui.LintRememberWindow
+import io.github.lumkit.desktop.ui.LintWindow
 import io.github.lumkit.desktop.ui.theme.AnimatedLintTheme
 import io.github.lumkit.desktop.ui.theme.LocalThemeStore
 import lint_ui.example.generated.resources.*
@@ -20,10 +20,12 @@ fun main() = lintApplication(
 ) {
     val context = LocalContext.current
 
-    LintRememberWindow(
+    // Toggles the global dark theme mode.
+    LintWindow(
         onCloseRequest = ::exitApplication,
+        rememberSize = true,
         title = context.getPackageName(),
-        icon = painterResource(Res.drawable.compose_multiplatform)
+        icon = painterResource(Res.drawable.compose_multiplatform),
     ) {
         window.minimumSize = Dimension(800, 600)
         AnimatedLintTheme(

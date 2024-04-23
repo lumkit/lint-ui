@@ -132,5 +132,15 @@ val screens = arrayOf(
         screen = @Composable {
             LayerWindowExampleScreen()
         },
-    )
+    ),
+    NavItem(
+        title = "Toast",
+        subtitle = "简单的弹出提示示例",
+        icon = {
+            Icon(Icons.Default.PrivacyTip, contentDescription = null)
+        },
+        screen = @Composable {
+            ToastExampleScreen()
+        },
+    ),
 )

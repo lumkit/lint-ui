@@ -48,6 +48,7 @@ Before that, you can run the example we provided for you to see the concrete eff
 |:-------:|:------:|:-----------------:|:--------------:|:--------:|
 |  1.0.1  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
 |  1.0.2  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
+|  1.0.3  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
 
 ### 1. Configure the Maven central warehouse for the project.
 
@@ -56,6 +57,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://jitpack.io")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
@@ -66,7 +68,11 @@ dependencyResolutionManagement {
 ```kotlin
 dependencies {
     // You just import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
+
+    // Base on KMP
     implementation("io.github.lumkit:lint-compose-ui:1.0.2")
+    // Only Desktop
+    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.2")
 }
 ```
 
@@ -80,7 +86,7 @@ import io.github.lumkit.desktop.context.LocalContext
 import io.github.lumkit.desktop.data.DarkThemeMode
 import io.github.lumkit.desktop.example.App
 import io.github.lumkit.desktop.lintApplication
-import io.github.lumkit.desktop.ui.LintRememberWindow
+import io.github.lumkit.desktop.ui.LintWindow
 import io.github.lumkit.desktop.ui.theme.AnimatedLintTheme
 import io.github.lumkit.desktop.ui.theme.LocalThemeStore
 import lint_ui.example.generated.resources.*
@@ -89,42 +95,26 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.awt.Dimension
 
+@OptIn(ExperimentalResourceApi::class)
 fun main() = lintApplication(
-    packageName = "LintUIExample"
+  packageName = "LintUIExample"
 ) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    LintRememberWindow(
-        onCloseRequest = ::exitApplication,
-        title = context.getPackageName(),
-        icon = painterResource(Res.drawable.compose_multiplatform)
+  // Toggles the global dark theme mode.
+  LintWindow(
+    onCloseRequest = ::exitApplication,
+    rememberSize = true,
+    title = context.getPackageName(),
+    icon = painterResource(Res.drawable.compose_multiplatform),
+  ) {
+    window.minimumSize = Dimension(800, 600)
+    AnimatedLintTheme(
+      modifier = Modifier.fillMaxSize(),
     ) {
-        window.minimumSize = Dimension(800, 600)
-        AnimatedLintTheme(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            Text("Hello Lint UI")
-        }
-
-        // Toggles the global dark theme mode.
-        val themeMode = LocalThemeStore.current
-        MenuBar {
-            Menu(stringResource(Res.string.text_dark_theme)) {
-                DarkThemeMode.entries.forEach { entry ->
-                    CheckboxItem(
-                        when (entry) {
-                            DarkThemeMode.SYSTEM -> stringResource(Res.string.text_theme_system)
-                            DarkThemeMode.LIGHT -> stringResource(Res.string.text_theme_light)
-                            DarkThemeMode.DARK -> stringResource(Res.string.text_theme_dark)
-                        },
-                        checked = themeMode.darkTheme == entry
-                    ) {
-                        themeMode.darkTheme = entry
-                    }
-                }
-            }
-        }
+      Text("Hello Lint UI!")
     }
+  }
 }
 ```
 

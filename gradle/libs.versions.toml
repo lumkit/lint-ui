@@ -8,7 +8,7 @@ sqlite-jdbc = "3.44.1.0"
 gson = "2.10.1"
 j-system-theme-detector = "3.8"
 flat-lat = "3.4.1"
-lint-compose-ui = "1.0.2"
+lint-compose-ui = "1.0.3"
 vanniktech = "0.28.0"
 
 [libraries]
