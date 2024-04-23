@@ -1,7 +1,7 @@
 # Lint UI for Compose Desktop
 
 [![License](https://img.shields.io/github/license/lumkit/lint-ui)](LICENSE)
-[![Version](https://img.shields.io/github/v/release/lumkit/lint-ui?include_prereleases)](https://github.com/Konyaco/compose-fluent-ui/releases)
+[![Version](https://img.shields.io/github/v/release/lumkit/lint-ui?include_prereleases)](https://github.com/lumkit/lint-ui/releases)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.lumkit/lint-compose-ui)](https://central.sonatype.com/artifact/io.github.lumkit/lint-compose-ui/)
 
 A Compose Desktop UI framework supporting global theme control. (aka LintUI)
