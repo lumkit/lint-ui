@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -104,16 +105,16 @@ fun LintWindow(
         val toastShowState = remember { mutableStateOf(false) }
 
         LaunchedEffect(true) {
+            val queues = contextWrapper.toastQueues
             withContext(Dispatchers.IO) {
-                val queue = contextWrapper.toastQueues
                 while (isActive) {
-                    if (queue.isNotEmpty()) {
-                        val toastQueue = queue.first()
+                    if (queues.isNotEmpty()) {
+                        val toastQueue = queues.first()
                         toastShowState.value = true
                         delay(toastQueue.time)
                         toastShowState.value = false
                         delay(400)
-                        queue.remove(toastQueue)
+                        queues.remove(toastQueue)
                     }
                 }
             }
@@ -186,30 +187,12 @@ private fun Toast(toastShowState: MutableState<Boolean>, contextWrapper: Context
                 )
             }
         ) {
-            Row(
-                horizontalArrangement = Arrangement.End,
+            AnimatedVisibility(
+                visible = init,
+                enter = fadeIn() + enterTransition,
+                exit = fadeOut() + exitTransition,
             ) {
-                AnimatedVisibility(
-                    visible = init,
-                    enter = fadeIn() + enterTransition,
-                    exit = fadeOut() + exitTransition,
-                ) {
-                    AnimatedLintTheme(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .border(
-                                border = BorderStroke(1.dp, DividerDefaults.color),
-                                shape = RoundedCornerShape(8.dp)
-                            ),
-                    ) {
-                        Text(
-                            text = toastQueue.message,
-                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
+                toastQueue.content()
             }
         }
     }

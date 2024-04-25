@@ -24,7 +24,10 @@ This UI framework will remain open source and free.
     - [x] Folded container (Lint Folder)
     - [x] Minimizable, collapsible and nestable side navigation bar (Lint Side)
     - [x] Flexible window without native decoration (Lint Layer Window)
+    - [x] Dialog of basic style (Lint Dialog)
     - [x] Toast (Lint Window Toast)
+    - [x] Circle Indicator & Linear Indicator (Lint Progress/Lint Indicator)
+    - [x] Stack Chart (Lint Stack Chart)
     - [ ] More beautiful and practical UI components will continue to be developed in the future
 - [x] A simple context provider
 - [x] Shared Preferences based on SQLite (SharedPreferences)
@@ -35,10 +38,13 @@ This UI framework will remain open source and free.
 - [ ] More features will be continuously updated in the future
 
 ## Screen shoot
+
 ![screen-shoot.png](static/img/screen-shoot.png)
 
 ## Use this library in your project
+
 Before that, you can run the example we provided for you to see the concrete effect.
+
 ```shell
 ./gradlew desktopRun -DmainClass=MainKt --quiet
 ```
@@ -50,6 +56,7 @@ Before that, you can run the example we provided for you to see the concrete eff
 |  1.0.1  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
 |  1.0.2  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
 |  1.0.3  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
+|  1.0.4  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
 
 ### 1. Configure the Maven central warehouse for the project.
 
@@ -98,24 +105,23 @@ import java.awt.Dimension
 
 @OptIn(ExperimentalResourceApi::class)
 fun main() = lintApplication(
-  packageName = "LintUIExample"
+    packageName = "LintUIExample"
 ) {
-  val context = LocalContext.current
+    val context = LocalContext.current
 
-  // Toggles the global dark theme mode.
-  LintWindow(
-    onCloseRequest = ::exitApplication,
-    rememberSize = true,
-    title = context.getPackageName(),
-    icon = painterResource(Res.drawable.compose_multiplatform),
-  ) {
-    window.minimumSize = Dimension(800, 600)
-    AnimatedLintTheme(
-      modifier = Modifier.fillMaxSize(),
+    // Toggles the global dark theme mode.
+    LintWindow(
+        onCloseRequest = ::exitApplication,
+        rememberSize = true,
+        title = context.getPackageName(),
+        icon = painterResource(Res.drawable.compose_multiplatform),
     ) {
-      Text("Hello Lint UI!")
+        AnimatedLintTheme(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Text("Hello Lint UI!")
+        }
     }
-  }
 }
 ```
 
