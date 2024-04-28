@@ -78,9 +78,9 @@ dependencies {
     // You just import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
 
     // Base on KMP
-    implementation("io.github.lumkit:lint-compose-ui:1.0.3")
+    implementation("io.github.lumkit:lint-compose-ui:1.0.4")
     // Only Desktop
-    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.3")
+    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.4")
 }
 ```
 
