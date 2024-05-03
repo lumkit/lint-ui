@@ -14,6 +14,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
@@ -30,6 +32,7 @@ import io.github.lumkit.desktop.context.ContextWrapper
 import io.github.lumkit.desktop.context.LocalContext
 import io.github.lumkit.desktop.context.LocalContextWrapper
 import io.github.lumkit.desktop.data.WindowSize
+import io.github.lumkit.desktop.lifecycle.ViewModel
 import io.github.lumkit.desktop.preferences.LocalSharedPreferences
 import io.github.lumkit.desktop.preferences.SharedPreferences
 import io.github.lumkit.desktop.ui.theme.AnimatedLintTheme
@@ -46,6 +49,7 @@ import java.awt.Dimension
 import java.awt.event.WindowEvent
 import java.awt.event.WindowFocusListener
 import java.io.File
+import kotlin.reflect.KClass
 
 /**
  * A window with full coverage.
@@ -74,8 +78,14 @@ fun LintWindow(
     if (rememberSize) {
         state.RememberWindowSize(title)
     }
+
+    val viewModelPool = rememberSaveable { mutableStateMapOf<Any, ViewModel>() }
+
     Window(
-        onCloseRequest,
+        onCloseRequest = {
+            viewModelPool.clear()
+            onCloseRequest()
+        },
         state,
         visible,
         title,
@@ -93,12 +103,15 @@ fun LintWindow(
         val contextWrapper = remember {
             object : ContextWrapper() {
                 override fun getWindow(): ComposeWindow = window
+                override val viewModelPool: SnapshotStateMap<Any, ViewModel>
+                    get() = viewModelPool
                 override fun getPackageName(): String = context.getPackageName()
                 override fun getDir(name: String): File = context.getDir(name)
                 override fun getFilesDir(): File = context.getFilesDir()
                 override fun getSharedPreferences(name: String): SharedPreferences = context.getSharedPreferences(name)
                 override fun getTheme(sharedPreferences: SharedPreferences): LintTheme =
                     context.getTheme(sharedPreferences)
+
             }
         }
 

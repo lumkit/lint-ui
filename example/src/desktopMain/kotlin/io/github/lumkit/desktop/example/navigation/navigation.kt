@@ -1,16 +1,17 @@
 package io.github.lumkit.desktop.example.navigation
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.github.lumkit.desktop.example.screen.*
 
 data class NavItem(
@@ -63,9 +64,10 @@ val screens = arrayOf(
             Icon(Icons.Default.Widgets, contentDescription = null)
         },
         screen = @Composable {
-            Box(
+            Column(
                 Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("欢迎使用Lint UI Compose Framework")
             }
@@ -141,6 +143,16 @@ val screens = arrayOf(
         },
         screen = @Composable {
             ToastExampleScreen()
+        },
+    ),
+    NavItem(
+        title = "Simple ViewModel",
+        subtitle = "简单的单例ViewModel",
+        icon = {
+            Icon(Icons.Default.ModelTraining, contentDescription = null)
+        },
+        screen = @Composable {
+            ViewModelExampleScreen()
         },
     ),
 )

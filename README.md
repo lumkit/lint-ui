@@ -35,6 +35,7 @@ This UI framework will remain open source and free.
 - [x] Out-of-box theme installation framework
 - [x] Unify the global theme
 - [x] Dynamic perception system dark mode
+- [x] View Model Store
 - [ ] More features will be continuously updated in the future
 
 ## Screen shoot
@@ -53,10 +54,11 @@ Before that, you can run the example we provided for you to see the concrete eff
 
 | Lint UI | Kotlin | Compose Framework | Compose Plugin |   Java   |
 |:-------:|:------:|:-----------------:|:--------------:|:--------:|
-|  1.0.1  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
-|  1.0.2  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
-|  1.0.3  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
-|  1.0.4  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 11++ |
+|  1.0.1  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.2  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.3  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.4  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.5  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
 
 ### 1. Configure the Maven central warehouse for the project.
 
@@ -78,9 +80,9 @@ dependencies {
     // You just import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
 
     // Base on KMP
-    implementation("io.github.lumkit:lint-compose-ui:1.0.4")
+    implementation("io.github.lumkit:lint-compose-ui:1.0.5")
     // Only Desktop
-    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.4")
+    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.5")
 }
 ```
 
@@ -144,6 +146,7 @@ fun main() = lintApplication(
     // Gets the theme instance in the specified persistence file.
     val theme = context.getTheme(sharedPreferences = sharedPreferences)
    ```
+
 * Shared Preferences
    ```kotlin
     // Gets the global SharedPreferences instance.
@@ -157,6 +160,34 @@ fun main() = lintApplication(
     // Put type data
     sharedPreferences.put("type-data", arrayListOf("Dark", "Light"))
    ```
+
+* ViewModel
+  ```kotlin
+  // Create a new entity class that inherits ViewModel[io.github.lumkit.desktop.lifecycle.ViewModel], such as "MyViewModel".
+  class MyViewModel : ViewModel() {
+  
+      private val _text = MutableStateFlow("")
+      val text: StateFlow<String> = _text.asStateFlow()
+  
+      fun setText(text: String) {
+          _text.value = text
+      }
+  
+  }
+  
+  // use view model and state
+  val viewModel = viewModel<MyViewModel>()
+  val text by viewModel.text.collectAsState()
+  
+  LintTextField(
+      value = text,
+      onValueChange = viewModel::setText,
+      label = {
+          Text("输入内容")
+      }
+  )
+  ```
+
 * More built-in APIs will be gradually opened, so stay tuned
 
 ## Excellent cited framework or repositories (Rank insensitive)
