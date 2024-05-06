@@ -1,9 +1,9 @@
 package io.github.lumkit.desktop.data
 
-import com.google.gson.annotations.SerializedName
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class WindowSize(
-    @SerializedName("width") val width : Float,
-    @SerializedName("height") val height : Float,
-): Serializable
+    val width: Float,
+    val height: Float,
+)

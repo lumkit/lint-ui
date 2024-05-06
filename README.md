@@ -59,6 +59,7 @@ Before that, you can run the example we provided for you to see the concrete eff
 |  1.0.3  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
 |  1.0.4  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
 |  1.0.5  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.6  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
 
 ### 1. Configure the Maven central warehouse for the project.
 
@@ -80,9 +81,9 @@ dependencies {
     // You just import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
 
     // Base on KMP
-    implementation("io.github.lumkit:lint-compose-ui:1.0.5")
+    implementation("io.github.lumkit:lint-compose-ui:1.0.6")
     // Only Desktop
-    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.5")
+    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.6")
 }
 ```
 

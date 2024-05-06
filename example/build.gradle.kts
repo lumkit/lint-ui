@@ -29,6 +29,8 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
+            modules("java.sql")
+
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "io.github.lumkit.lint"
             packageVersion = libs.versions.lint.compose.ui.get()

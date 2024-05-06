@@ -3,8 +3,10 @@ package io.github.lumkit.desktop.ui.theme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.*
-import com.google.gson.Gson
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import io.github.lumkit.desktop.Const
 import io.github.lumkit.desktop.annotates.MODE_FILES
 import io.github.lumkit.desktop.common.toColor
@@ -13,6 +15,7 @@ import io.github.lumkit.desktop.data.DarkThemeMode
 import io.github.lumkit.desktop.data.SchemesBasic
 import io.github.lumkit.desktop.data.ThemeBean
 import io.github.lumkit.desktop.preferences.SharedPreferences
+import io.github.lumkit.desktop.util.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.*
@@ -47,8 +50,6 @@ class LintTheme internal constructor(
         }
     }
 
-    private val gson by lazy { Gson() }
-
     /**
      * Load theme profiles file.
      * Invalid theme profiles will not be displayed.
@@ -60,10 +61,7 @@ class LintTheme internal constructor(
             themeBeans.add(
                 FileInputStream(file).use {
                     BufferedInputStream(it).use { buffered ->
-                        gson.fromJson(
-                            String(buffered.readBytes(), Charsets.UTF_8),
-                            ThemeBean::class.java
-                        )
+                        json.decodeFromString<ThemeBean>(String(buffered.readBytes(), Charsets.UTF_8))
                     }
                 }.copy(label = file.name)
             )
@@ -126,7 +124,7 @@ class LintTheme internal constructor(
     }
 
     fun read(themeName: String): ThemeBean =
-        gson.fromJson(File(themesDir, themeName).readText(), ThemeBean::class.java).copy(label = themeName)
+        json.decodeFromString<ThemeBean>(File(themesDir, themeName).readText()).copy(label = themeName)
 
     data class LintThemeColorSchemes(
         val label: String? = null,
@@ -141,7 +139,7 @@ class LintTheme internal constructor(
         val file = File(themesDir, name)
         if (file.delete()) {
             onSuccess()
-        }else {
+        } else {
             onFailed()
         }
     }

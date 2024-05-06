@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.vanniktech.maven.publish)
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 group = "io.github.lumkit"
@@ -28,6 +29,8 @@ kotlin {
             api(compose.materialIconsExtended)
             api(compose.uiTooling)
             api(compose.uiUtil)
+            api(libs.kotlinx.serialization.json)
+
         }
         desktopMain.dependencies {
             api(compose.desktop.common)
@@ -41,9 +44,6 @@ kotlin {
             api(libs.exposed.json)
             api(libs.exposed.kotlin.datetime)
             api(libs.sqlite.jdbc)
-
-            //gson
-            api(libs.gson)
 
             api(libs.j.system.theme.detector)
             api(libs.flat.lat)

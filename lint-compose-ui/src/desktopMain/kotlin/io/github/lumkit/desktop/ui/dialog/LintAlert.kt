@@ -1,5 +1,6 @@
 package io.github.lumkit.desktop.ui.dialog
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,7 +8,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,64 +36,112 @@ fun LintAlert(
     DialogBasic(
         visible, isCancel
     ) {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Column(Modifier.background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = .3f))) {
+        AlertContent(
+            title, scrollable, content, confirmButtonText, onConfirm, cancelButtonText, onCancel
+        )
+    }
+}
+
+@Composable
+fun LintAlert(
+    visible: Boolean,
+    isCancel: Boolean = true,
+    title: String,
+    cancelButtonText: String? = null,
+    onCancel: (() -> Unit)? = null,
+    confirmButtonText: String? = null,
+    onConfirm: (() -> Unit)? = null,
+    scrollable: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val visibleState = rememberSaveable { mutableStateOf(visible) }
+
+    LaunchedEffect(visible) {
+        visibleState.value = visible
+    }
+
+    DialogBasic(
+        visibleState, isCancel
+    ) {
+        AlertContent(
+            title,
+            scrollable,
+            content,
+            confirmButtonText,
+            onConfirm,
+            cancelButtonText,
+            onCancel,
+        )
+    }
+}
+
+@Composable
+private fun AlertContent(
+    title: String,
+    scrollable: Boolean,
+    content: @Composable() (ColumnScope.() -> Unit),
+    confirmButtonText: String?,
+    onConfirm: (() -> Unit)?,
+    cancelButtonText: String?,
+    onCancel: (() -> Unit)?
+) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Column(Modifier.background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = .3f))) {
+            Column(
+                Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 28.dp)
+                    .fillMaxWidth()
+                    .weight(1f, fill = false)
+            ) {
+                Spacer(Modifier.height(28.dp))
+                Text(
+                    style = MaterialTheme.typography.titleLarge,
+                    text = title,
+                )
+                Spacer(Modifier.height(12.dp))
                 Column(
-                    Modifier
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(horizontal = 28.dp)
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f, fill = false)
+                        .then(
+                            if (scrollable) Modifier.verticalScroll(rememberScrollState())
+                            else Modifier
+                        )
                 ) {
-                    Spacer(Modifier.height(28.dp))
-                    Text(
-                        style = MaterialTheme.typography.titleLarge,
-                        text = title,
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Column(
-                        modifier =  Modifier
-                            .fillMaxWidth()
-                            .then(
-                                if (scrollable) Modifier.verticalScroll(rememberScrollState())
-                                else Modifier
-                            )
-                    ) {
-                        ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
-                            content()
-                        }
+                    ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+                        content()
                     }
-                    Spacer(Modifier.height(28.dp))
                 }
-                // Button Grid
-                if (!(onConfirm == null && onCancel == null)) {
-                    // Divider
-                    LintHorizontalDivider()
-                    Box(
-                        Modifier
-                            .height(80.dp)
-                            .padding(horizontal = 28.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            if (onConfirm != null) {
-                                LintButton(modifier = Modifier.weight(1f), onClick = onConfirm) {
-                                    Text(confirmButtonText ?: "")
-                                }
+                Spacer(Modifier.height(28.dp))
+            }
+            // Button Grid
+            if (!(onConfirm == null && onCancel == null)) {
+                // Divider
+                LintHorizontalDivider()
+                Box(
+                    Modifier
+                        .height(80.dp)
+                        .padding(horizontal = 28.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        if (onConfirm != null) {
+                            LintButton(modifier = Modifier.weight(1f), onClick = onConfirm) {
+                                Text(confirmButtonText ?: "")
                             }
-                            if (onCancel != null) {
-                                LintButton(
-                                    modifier = Modifier.weight(1f),
-                                    onClick = onCancel,
-                                    colors = ButtonDefaults.filledTonalButtonColors()
-                                ) {
-                                    Text(cancelButtonText ?: "")
-                                }
+                        }
+                        if (onCancel != null) {
+                            LintButton(
+                                modifier = Modifier.weight(1f),
+                                onClick = onCancel,
+                                colors = ButtonDefaults.filledTonalButtonColors()
+                            ) {
+                                Text(cancelButtonText ?: "")
                             }
                         }
                     }
@@ -105,22 +157,27 @@ fun DialogBasic(
     isCancel: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    if (visible.value) {
-        Dialog(
-            onDismissRequest = {
-                if (isCancel) {
-                    visible.value = false
-                }
-            },
-            properties = DialogProperties(
-                dismissOnBackPress = isCancel,
-                dismissOnClickOutside = isCancel,
-            )
-        ) {
-            Box(
-                modifier = Modifier.padding(28.dp)
+    AnimatedContent(
+        modifier = Modifier.fillMaxSize(),
+        targetState = visible.value
+    ) {
+        if (it) {
+            Dialog(
+                onDismissRequest = {
+                    if (isCancel) {
+                        visible.value = false
+                    }
+                },
+                properties = DialogProperties(
+                    dismissOnBackPress = isCancel,
+                    dismissOnClickOutside = isCancel,
+                )
             ) {
-                content()
+                Box(
+                    modifier = Modifier.padding(28.dp)
+                ) {
+                    content()
+                }
             }
         }
     }

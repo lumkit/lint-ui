@@ -88,3 +88,64 @@ fun LintFolder(
         }
     }
 }
+
+@Composable
+fun LintItem(
+    modifier: Modifier,
+    icon: @Composable (() -> Unit)? = null,
+    label: @Composable () -> Unit,
+    tooltipText: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (RowScope.() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
+) {
+    LintOutlineCard(
+        modifier = modifier,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            icon?.also {
+                Spacer(Modifier.width(16.dp))
+                Surface(
+                    modifier = Modifier.size(16.dp),
+                    color = Color.Transparent,
+                ) {
+                    it()
+                }
+            }
+            Spacer(Modifier.width(16.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Column(
+                    modifier = Modifier.padding(vertical = 8.dp)
+                ) {
+                    Text("", style = MaterialTheme.typography.titleMedium)
+                    Text("", style = MaterialTheme.typography.labelMedium)
+                }
+                Column {
+                    ProvideTextStyle(MaterialTheme.typography.titleMedium) {
+                        label()
+                    }
+                    tooltipText?.also {
+                        ProvideTextStyle(MaterialTheme.typography.labelMedium) {
+                            it()
+                        }
+                    }
+                }
+            }
+            trailingIcon?.also {
+                Spacer(Modifier.width(16.dp))
+                Row(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                ) {
+                    it()
+                }
+            }
+            Spacer(Modifier.width(16.dp))
+        }
+    }
+}

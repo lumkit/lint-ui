@@ -6,13 +6,12 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.DividerDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -26,7 +25,6 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import com.google.gson.Gson
 import io.github.lumkit.desktop.Const
 import io.github.lumkit.desktop.context.ContextWrapper
 import io.github.lumkit.desktop.context.LocalContext
@@ -37,6 +35,7 @@ import io.github.lumkit.desktop.preferences.LocalSharedPreferences
 import io.github.lumkit.desktop.preferences.SharedPreferences
 import io.github.lumkit.desktop.ui.theme.AnimatedLintTheme
 import io.github.lumkit.desktop.ui.theme.LintTheme
+import io.github.lumkit.desktop.util.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
@@ -45,11 +44,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
 import java.awt.Dimension
 import java.awt.event.WindowEvent
 import java.awt.event.WindowFocusListener
 import java.io.File
-import kotlin.reflect.KClass
 
 /**
  * A window with full coverage.
@@ -105,6 +104,7 @@ fun LintWindow(
                 override fun getWindow(): ComposeWindow = window
                 override val viewModelPool: SnapshotStateMap<Any, ViewModel>
                     get() = viewModelPool
+
                 override fun getPackageName(): String = context.getPackageName()
                 override fun getDir(name: String): File = context.getDir(name)
                 override fun getFilesDir(): File = context.getFilesDir()
@@ -441,11 +441,10 @@ fun WindowState.RememberWindowSize(
     id: String
 ) {
     val sharedPreferences = LocalSharedPreferences.current
-    val gson = remember { Gson() }
     val key = "${Const.WINDOW_SIZE}-$id"
 
     try {
-        val windowSize = gson.fromJson(sharedPreferences.getString(key), WindowSize::class.java)
+        val windowSize = json.decodeFromString<WindowSize>(sharedPreferences.getString(key) ?: "")
         size = DpSize(windowSize.width.dp, windowSize.height.dp)
     } catch (_: Exception) {
     }
@@ -457,7 +456,7 @@ fun WindowState.RememberWindowSize(
                 if (it.width.value > 0 && it.height.value > 0) {
                     try {
                         val size = WindowSize(it.width.value, it.height.value)
-                        sharedPreferences.putString(key, gson.toJson(size))
+                        sharedPreferences.putString(key, json.encodeToString(size))
                     } catch (_: Exception) {
                     }
                 }
