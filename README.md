@@ -52,14 +52,15 @@ Before that, you can run the example we provided for you to see the concrete eff
 
 ### LintUI framework version requirements
 
-| Lint UI | Kotlin | Compose Framework | Compose Plugin |   Java   |
-|:-------:|:------:|:-----------------:|:--------------:|:--------:|
-|  1.0.1  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
-|  1.0.2  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
-|  1.0.3  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
-|  1.0.4  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
-|  1.0.5  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
-|  1.0.6  | 1.9.22 |       1.6.2       |     1.6.0      | JDK 17++ |
+| Lint UI |  Kotlin   | Compose Framework | Compose Plugin |   Java   |
+|:-------:|:---------:|:-----------------:|:--------------:|:--------:|
+|  1.0.1  |  1.9.22   |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.2  |  1.9.22   |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.3  |  1.9.22   |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.4  |  1.9.22   |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.5  |  1.9.22   |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.6  |  1.9.22   |       1.6.2       |     1.6.0      | JDK 17++ |
+|  1.0.7  | 2.0.0-RC2 |      1.6.11       |     1.6.11     | JDK 17++ |
 
 ### 1. Configure the Maven central warehouse for the project.
 
@@ -81,9 +82,9 @@ dependencies {
     // You just import dependencies such as jb-compose-desktop-currentOs and jb-compose-components-resources.
 
     // Base on KMP
-    implementation("io.github.lumkit:lint-compose-ui:1.0.6")
+    implementation("io.github.lumkit:lint-compose-ui:1.0.7")
     // Only Desktop
-    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.6")
+    implementation("io.github.lumkit:lint-compose-ui-desktop:1.0.7")
 }
 ```
 

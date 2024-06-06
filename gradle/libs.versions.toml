@@ -1,14 +1,14 @@
 [versions]
-compose = "1.6.2"
-compose-plugin = "1.6.0"
+compose = "1.6.11"
+compose-plugin = "1.6.11"
 junit = "4.13.2"
-kotlin = "1.9.22"
+kotlin = "2.0.0-RC2"
 exposed = "0.49.0"
 sqlite-jdbc = "3.44.1.0"
 gson = "2.10.1"
 j-system-theme-detector = "3.8"
 flat-lat = "3.4.1"
-lint-compose-ui = "1.0.6"
+lint-compose-ui = "1.0.7"
 vanniktech = "0.28.0"
 kotlinx-serialization = "1.6.3"
 
@@ -38,3 +38,4 @@ jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
